@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 
 namespace PolEko;
 
@@ -42,5 +41,16 @@ public class SmartProMeasurement : Measurement
   {
     return
       $"Temperature: {Temperature}, time of request: {TimeStamp}, device error: {Error}, network error: {NetworkError}";
+  }
+}
+
+public class ExampleMeasurement : Measurement
+{
+  public int Speed { get; init; }
+  public int Rpm { get; init; }
+
+  public override string ToString()
+  {
+    return $"Speed: {Speed}, RPM: {Rpm}";
   }
 }

@@ -363,6 +363,41 @@ public class SmartProDevice : Device<SmartProMeasurement, SmartProDeviceControl>
   #endregion
 }
 
+[DeviceModel("Example device")]
+public class ExampleDevice : Device<ExampleMeasurement, ExampleControl>
+{
+  public ExampleDevice(IPAddress ipAddress, ushort port, string? id = null)
+    : base(ipAddress, port, id)
+  {
+    // This is only necessary if API's URL is different than http://<ip_address>:<port>/
+    DeviceUri = new Uri($"http://{ipAddress}:{port}/api/");
+  }
+
+  public override string Model => "Example device";
+
+  public override string Description => "Device used in docs";
+  
+  protected override async Task<ExampleMeasurement> GetMeasurementFromDeviceAsync(HttpClient client)
+  {
+    var data = await client.GetStringAsync(DeviceUri);
+    using var document = JsonDocument.Parse(data);
+    var root = document.RootElement;
+    var speed = root.GetProperty("speed").GetInt32();
+    var rpmElement = root.GetProperty("rpm_props");
+    var rpm = rpmElement.GetProperty("rpm").GetInt32();
+    var error = rpmElement.GetProperty("error").GetBoolean();
+
+    var measurement = new ExampleMeasurement
+    {
+      Speed = speed,
+      Rpm = rpm,
+      Error = error
+    };
+
+    return measurement;
+  }
+}
+
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class DeviceModelAttribute : Attribute
 {
